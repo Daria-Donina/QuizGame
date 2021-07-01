@@ -16,15 +16,15 @@ namespace Assets.Scripts
 		public int NumberInRow { get; private set; } = 3;
 		public int RowCount 
 		{
-			get => rowCount;
+			get => _rowCount;
 			private set
 			{
-				rowCount = value;
+				_rowCount = value;
 
 				if (value == 4)
 				{
-					rowCount = 0;
-					gameFinished.Invoke();
+					_rowCount = 0;
+					GameFinished.Invoke();
 				}
 			}
 		}
@@ -32,29 +32,29 @@ namespace Assets.Scripts
 		public int GoalPlace { get; private set; }
 		public int SetIndex { get; private set; }
 
-		private List<int> usedGoals;
+		private List<int> _usedGoals;
+		private List<int> _usedIndexes;
 
-		private List<int> usedIndexes;
+		private System.Random _rnd;
+		private ViewModel _viewModel;
 
-		private System.Random rnd;
-		private int setsLength;
-		private ViewModel viewModel;
+		private int _setsLength;
+		private int _rowCount;
 
-		private UnityEvent<int[]> levelModelCreated = new UnityEvent<int[]>();
-		private UnityEvent gameFinished = new UnityEvent();
-		private int rowCount;
+		private UnityEvent<int[]> LevelModelCreated = new UnityEvent<int[]>();
+		private UnityEvent GameFinished = new UnityEvent();
 
 		public LevelModel(int setsLength, ViewModel viewModel)
 		{
-			rnd = new System.Random();
-			usedIndexes = new List<int>();
-			usedGoals = new List<int>();
+			_rnd = new System.Random();
+			_usedIndexes = new List<int>();
+			_usedGoals = new List<int>();
 
-			this.viewModel = viewModel;
-			this.setsLength = setsLength;
+			_viewModel = viewModel;
+			_setsLength = setsLength;
 
-			levelModelCreated.AddListener(viewModel.OnLevelModelCreated);
-			gameFinished.AddListener(viewModel.OnGameFinished);
+			LevelModelCreated.AddListener(viewModel.OnLevelModelCreated);
+			GameFinished.AddListener(viewModel.OnGameFinished);
 		}
 
 		/// <summary>
@@ -71,11 +71,11 @@ namespace Assets.Scripts
 			}
 
 			// Clearing indexes used on previous level.
-			usedIndexes.Clear();
+			_usedIndexes.Clear();
 
 			// Choosing random set.
-			SetIndex = ChooseSet(setsLength);
-			var setLength = viewModel.GetSetCount(SetIndex);
+			SetIndex = ChooseSet(_setsLength);
+			var setLength = _viewModel.GetSetCount(SetIndex);
 
 			// Choosing random goal place.
 			GoalPlace = ChoosePlace();
@@ -87,7 +87,7 @@ namespace Assets.Scripts
 			GenerateRow(setLength);
 
 			// finished generating model
-			levelModelCreated.Invoke(usedIndexes.ToArray());
+			LevelModelCreated.Invoke(_usedIndexes.ToArray());
 		}
 
 		/// <summary>
@@ -102,16 +102,16 @@ namespace Assets.Scripts
 
 		private int ChoosePlace()
 		{
-			return rnd.Next(RowCount * NumberInRow);
+			return _rnd.Next(RowCount * NumberInRow);
 		}
 
 		private int ChooseIndex(int setLength)
 		{
-			var index = rnd.Next(setLength);
+			var index = _rnd.Next(setLength);
 
-			while (usedIndexes.Contains(index) || index == GoalIndex)
+			while (_usedIndexes.Contains(index) || index == GoalIndex)
 			{
-				index = rnd.Next(setLength);
+				index = _rnd.Next(setLength);
 			}
 
 			return index;
@@ -119,27 +119,27 @@ namespace Assets.Scripts
 
 		private int ChooseGoalIndex(int setLength)
 		{
-			var index = rnd.Next(setLength);
+			var index = _rnd.Next(setLength);
 
 			// When used all the goals clear list and start again.
-			if (usedGoals.Count == setLength)
+			if (_usedGoals.Count == setLength)
 			{
-				usedGoals.Clear();
+				_usedGoals.Clear();
 			}
 
-			while (usedGoals.Contains(index))
+			while (_usedGoals.Contains(index))
 			{
-				index = rnd.Next(setLength);
+				index = _rnd.Next(setLength);
 			}
 
-			usedGoals.Add(index);
+			_usedGoals.Add(index);
 
 			return index;
 		}
 
 		private int ChooseSet(int setsLength)
 		{
-			return rnd.Next(setsLength);
+			return _rnd.Next(setsLength);
 		}
 
 		private void GenerateRow(int setLength)
@@ -159,7 +159,7 @@ namespace Assets.Scripts
 					index = ChooseIndex(setLength);
 				}
 
-				usedIndexes.Add(index);
+				_usedIndexes.Add(index);
 			}
 		}
 	}

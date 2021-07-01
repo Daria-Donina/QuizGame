@@ -20,11 +20,11 @@ public class PanelViewer : MonoBehaviour
 	[Range(0, 3)]
 	private float fadeDuration = 1;
 
-	private Image image;
+	private Image _image;
 
 	private void Awake()
 	{
-		image = panel.GetComponent<Image>();
+		_image = panel.GetComponent<Image>();
 	}
 
 	/// <summary>
@@ -33,7 +33,7 @@ public class PanelViewer : MonoBehaviour
     public void Show()
 	{
 		panel.SetActive(true);
-		image.DOFade(opacityValue / 255, fadeDuration);
+		_image.DOFade(opacityValue / 255, fadeDuration);
 	}
 
 	/// <summary>
@@ -41,7 +41,7 @@ public class PanelViewer : MonoBehaviour
 	/// </summary>
 	public void Hide()
 	{
-		image.DOFade(0, 0);
+		_image.DOFade(0, 0);
 		panel.SetActive(false);
 	}
 }
